@@ -1,7 +1,12 @@
 #include"mine.h"
 
-void print_map(char * p_mine,int rows,int cols,int mine){
+void print_map(const minemap * minem){
 
+	int rows = minem->rows;
+	int cols = minem->cols;
+	int mine = minem->mine;
+	char *p_mine = minem->p_mine;
+	
 	for(int i = 0; i <= cols; i++){
 	
 		printf("%2d",i);
@@ -48,5 +53,5 @@ void print_map(char * p_mine,int rows,int cols,int mine){
 		}
 	}
 
-return;
+return  ;
 }

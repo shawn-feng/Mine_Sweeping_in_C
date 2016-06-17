@@ -1,9 +1,14 @@
 #include"mine.h"
 
-static int open(int row,int col,char* p_mine,int rows,int cols);
+static int open(int row,int col,const minemap * minem);
 static int counts = 0;
-int sweep_map(char * p_mine, int rows,int cols ,int mine){
+int sweep_map(const minemap * minem){
 
+	int rows = minem->rows;
+	int cols = minem->cols;
+	int mine = minem->mine;
+	char *p_mine = minem->p_mine;
+	
 	int result = 0;
 	int row = 0,col = 0,operator = 0;
 	char * pt_mine = NULL;
@@ -30,7 +35,7 @@ int sweep_map(char * p_mine, int rows,int cols ,int mine){
 
 				if(!(*pt_mine>>4)){
 				
-					if(open(row,col,p_mine,rows,cols)){
+					if(open(row,col,minem)){
 						result = 1;
 					}
 				
@@ -51,7 +56,7 @@ int sweep_map(char * p_mine, int rows,int cols ,int mine){
 		}//end switch
 
 		printf("counts:%d\n",counts);
-		print_map(p_mine,rows,cols,mine);
+		print_map(minem);
 
 	}//end while
 
@@ -59,8 +64,12 @@ int sweep_map(char * p_mine, int rows,int cols ,int mine){
 	return result;
 }
 
-int open(int row,int col,char* p_mine,int rows,int cols){
+int open(int row,int col,const minemap* minem){
 
+	int rows = minem->rows;
+	int cols = minem->cols;
+	int mine = minem->mine;
+	char *p_mine = minem->p_mine;
 	for(int loopr = row - 1;loopr <= row + 1;loopr++){
 	
 		if(loopr < 0 ||loopr >= rows)continue;
@@ -82,7 +91,7 @@ int open(int row,int col,char* p_mine,int rows,int cols){
 
 				if(!(*pt_mine >> 4)){
 				
-			       		if(open(loopr,loopc,p_mine,rows,cols)){
+			       		if(open(loopr,loopc,minem)){
 						return 1;
 					}
 			

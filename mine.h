@@ -3,9 +3,15 @@
 
 #include<stdio.h>
 #include<stdlib.h>
-void mine_map(char * p_mine,int row,int col,int mine);
-void print_map(char * p_mine,int row ,int col ,int mine);
-int sweep_map(char * p_mine,int row ,int col,int mine);
-int result(int condition);
+typedef struct{
 
+	int rows;
+	int cols;
+	char *p_mine;
+	int mine;
+}minemap;
+void mine_map(const minemap * minem);
+void print_map(const minemap * minem);
+int sweep_map(const minemap * minem);
+int result(int condition);
 #endif

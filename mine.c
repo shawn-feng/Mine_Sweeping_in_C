@@ -2,9 +2,7 @@
 
 int main(){
 
-	int row ,col , mine;
-
-	char *p_mine = NULL;
+	minemap minem = {};
 
 	char agine = '\0';
 	
@@ -14,24 +12,24 @@ int main(){
 	
 		printf("Please input row :");
 
-		scanf("%d",&row);
+		scanf("%d",&(minem.rows));
 
 		printf("Please input col :");
 
-		scanf("%d",&col);
+		scanf("%d",&(minem.cols));
 
 		printf("Please input number of mines:");
 
-		scanf("%d",&mine);
+		scanf("%d",&(minem.mine));
 
-		p_mine = (char*)calloc(row * col,sizeof(char));
+		minem.p_mine = (char*)calloc(minem.rows * minem.cols,sizeof(char));
 
-		mine_map(p_mine,row,col,mine);
+		mine_map(&minem);
 
 
-		print_map(p_mine,row,col,mine);
+		print_map(&minem);
 
-		if(sweep_map(p_mine,row,col,mine) ==1){
+		if(sweep_map(&minem) ==1){
 			printf("successful\n");
 		}else{
 		
@@ -45,8 +43,8 @@ int main(){
 
 		}while(agine == 'Y' || agine == 'y');
 
-	free(p_mine);
-	p_mine = NULL;
+	free(minem.p_mine);
+	minem.p_mine = NULL;
 
 
 	return 0;
