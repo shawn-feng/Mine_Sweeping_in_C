@@ -1,14 +1,15 @@
 
 #include"link_ds.h"
 
-void init_link(struct link_ds* p_link){
+link_ds* init_link(void){
 
+	link_ds *p_link = malloc(sizeof(link_ds));
 	p_link->head = calloc(1,sizeof(unit));
 	p_link->tail = calloc(1,sizeof(unit));
 
 	p_link->head->p_next = p_link->tail;
 	p_link->tail->p_last = p_link->head;
-	return;
+	return p_link;
 }
 
 unit* insert_back(void *p_data,unit *p_p){
@@ -43,4 +44,19 @@ void clean(struct link_ds* p_link){
 	delete(p_d);
 	delete(p_link->tail);
 	return ;
+}
+
+unit* find_data(unit* start,void* dat,int(*compare)(void*,void*)){
+
+	unit* temp = NULL;
+	for(temp = start->p_next;temp != lds->tail;temp = temp->p_next){
+	
+		if(compare(temp->p_data,dat)){
+			continue;
+		}else{
+			return temp;
+		}
+	}
+
+	return NULL;
 }

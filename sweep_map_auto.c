@@ -1,31 +1,55 @@
 #include"mine.h"
 
-static int open(int row,int col,const minemap * minem);
+typedef struct {
+	int row;
+	int col;
+	int opt;
+	}opts;
+
+static int game(opts* optarr[],const minemap* minem);
+static int open(int row,int col,const minemap* minem);
 static int counts = 0;
 int sweep_map(const minemap * minem){
 
 	int rows = minem->rows;
 	int cols = minem->cols;
-	int mine = minem->mine;
 	char *p_mine = minem->p_mine;
-	
+	int mine = minem->mine;
 	int result = 0;
-	int row = 0,col = 0,operator = 0;
-	char * pt_mine = NULL;
 	counts = rows*cols - mine;
+	opts* optarr[10] = {NULL};
 	while(!result){
 	
-		printf("row,col,operator:1->open,2->flag,3->cancel\n");
-		scanf("%*[^\n]%*c");
-		scanf("%d,%d,%d",&row,&col,&operator);
-		row--;col--;
-		pt_mine = p_mine + cols * row + col;
-		switch(operator){
 		
-			case OPEN:
+		result = game(optarr,minem);
+		printf("counts:%d\n",counts);
+		print_map(minem);
+
+	}//end while
+
+
+	return result;
+}
+
+int game(opts* optarr[],const minemap* minem){
+
+	int rows = minem->rows;
+	int cols = minem->cols;
+	char *p_mine = minem->p_mine;
+	int mine = minem->mine;
+	for(int loop = 0;(optarr + loop) != NULL;loop++){
+	
+		int row = (optarr+loop)->row;
+		int col = (optarr+loop)->col;
+		int opt = (optarr+loop)->opt;
+		
+		char * pt_mine = p_mine + row * cols + col;
+		switch(opt){
+
+			case 1:
 			if(*pt_mine & 1){
 			
-				result = -1;
+				return  -1;
 			}else{
 
 				if(*pt_mine & 2)continue;
@@ -36,40 +60,35 @@ int sweep_map(const minemap * minem){
 				if(!(*pt_mine>>4)){
 				
 					if(open(row,col,minem)){
-						result = 1;
+						return 1;
 					}
 				
 				}
 			}
 			break;
 
-			case FLAG:
+			case 2:
 			*pt_mine |= 4;
 			break;
 
-			case CANL:
+			case 3:
 			break;
 
 			default:
 			break;
 		
 		}//end switch
-
-		printf("counts:%d\n",counts);
-		print_map(minem);
-
-	}//end while
-
-
-	return result;
+	
+	}
+	return 0;
 }
 
 int open(int row,int col,const minemap* minem){
 
 	int rows = minem->rows;
 	int cols = minem->cols;
-	int mine = minem->mine;
 	char *p_mine = minem->p_mine;
+	int mine = minem->mine;
 	for(int loopr = row - 1;loopr <= row + 1;loopr++){
 	
 		if(loopr < 0 ||loopr >= rows)continue;

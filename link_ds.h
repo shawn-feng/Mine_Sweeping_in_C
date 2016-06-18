@@ -6,7 +6,7 @@
 #include<unistd.h>
 typedef struct unit {
 
-	void* p_data;
+	void* p_data;	
 	struct unit* p_next;
 	struct unit* p_last;
 
@@ -16,16 +16,16 @@ typedef struct link_ds{
 
 	unit* head;
 	unit* tail;
-	void(*init_link)(struct link_ds *);
+	struct link_ds* (*init_link)(void);
 	unit* (*insert_back)(void*,unit*);
 	void(*delete)(unit*);
 	void(*clean)(struct link_ds*);
 
 }link_ds;
-void init_link(struct link_ds* p_link);
+struct link_ds* init_link(void);
 unit* insert_back(void *p_data,unit *p_p);
 void delete(unit *p_d);
 void clean(struct link_ds* p_link);
-
+unit* find_data(link_ds*,void* dat ,int(*compare)(void*,void*));
 
 #endif

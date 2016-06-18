@@ -3,6 +3,9 @@
 
 #include<stdio.h>
 #include<stdlib.h>
+#define OPEN 1
+#define FLAG 2
+#define CANL 3
 typedef struct{
 
 	int rows;
