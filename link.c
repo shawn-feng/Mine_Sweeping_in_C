@@ -1,24 +1,6 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<unistd.h>
-typedef struct unit {
 
-	void* p_data;
-	struct unit* p_next;
-	struct unit* p_last;
+#include"link_ds.h"
 
-}unit;
-
-typedef struct link_ds{
-
-	unit* head;
-	unit* tail;
-	void(*init_link)(struct link_ds *);
-	unit* (*insert_back)(void*,unit*);
-	void(*delete)(unit*);
-	void(*clean)(struct link_ds*);
-
-}link_ds;
 void init_link(struct link_ds* p_link){
 
 	p_link->head = calloc(1,sizeof(unit));
