@@ -15,6 +15,8 @@ typedef struct{
 }minemap;
 void mine_map(const minemap * minem);
 void print_map(const minemap * minem);
-int sweep_map(const minemap * minem);
+void print_open(const minemap * minem);
+int sweep_map(minemap * minem);
 int result(int condition);
+void fcleararr(void);
 #endif

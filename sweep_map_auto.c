@@ -1,65 +1,69 @@
 #include"mine.h"
-
+#include"link_ds.h"
 typedef struct {
 	int row;
 	int col;
 	int opt;
 	}opts;
-
-static int game(opts* optarr[],const minemap* minem);
-static int open(int row,int col,const minemap* minem);
+link_ds* analysis(minemap * minem);
+static int game(link_ds* optarr,const minemap* minem);
+static int openf(int row,int col,const minemap* minem);
 static int counts = 0;
-int sweep_map(const minemap * minem){
+int sweep_map(minemap * minem){
 
 	int rows = minem->rows;
 	int cols = minem->cols;
-	char *p_mine = minem->p_mine;
+	//char *p_mine = minem->p_mine;
 	int mine = minem->mine;
 	int result = 0;
 	counts = rows*cols - mine;
-	opts* optarr[10] = {NULL};
+	link_ds* optarr = NULL;
 	while(!result){
 	
-		
+		optarr = analysis(minem);
+		printf("optarr:%p\n",optarr);
 		result = game(optarr,minem);
 		printf("counts:%d\n",counts);
 		print_map(minem);
 
 	}//end while
-
+	
+	fcleararr();
 
 	return result;
 }
 
-int game(opts* optarr[],const minemap* minem){
-
-	int rows = minem->rows;
+int game(link_ds* optarr,const minemap* minem){
+	printf("game begin...\n");
+	//int rows = minem->rows;
 	int cols = minem->cols;
-	char *p_mine = minem->p_mine;
-	int mine = minem->mine;
-	for(int loop = 0;(optarr + loop) != NULL;loop++){
+    char *pt_mine = NULL;
+	//int mine = minem->mine;
+	for(unit* temp = optarr->head->p_next;temp != optarr->tail;temp = temp->p_next){
 	
-		int row = (optarr+loop)->row;
-		int col = (optarr+loop)->col;
-		int opt = (optarr+loop)->opt;
-		
-		char * pt_mine = p_mine + row * cols + col;
+		int row = ((opts*)(temp->p_data))->row;
+		int col = ((opts*)(temp->p_data))->col;
+		int opt = ((opts*)(temp->p_data))->opt;
+        
+        printf("row:%d,col:%d,opt:%d\n",row,col,opt);
+		pt_mine = minem->p_mine + row * cols + col;
+		printf("mine is %d\n",*pt_mine);
 		switch(opt){
 
 			case 1:
 			if(*pt_mine & 1){
-			
+				printf("BOOM...\n");	
 				return  -1;
 			}else{
 
-				if(*pt_mine & 2)continue;
+				if(*pt_mine & 2)break;
 			
 				*pt_mine |= 2;
-				if((--counts) <= 0) result =  1;
+				if((--counts) <= 0) return 1;
 
 				if(!(*pt_mine>>4)){
 				
-					if(open(row,col,minem)){
+					if(openf(row,col,minem)){
 						return 1;
 					}
 				
@@ -79,16 +83,17 @@ int game(opts* optarr[],const minemap* minem){
 		
 		}//end switch
 	
-	}
+	}//end for
+	printf("game ending\n");
 	return 0;
 }
 
-int open(int row,int col,const minemap* minem){
+int openf(int row,int col,const minemap* minem){
 
 	int rows = minem->rows;
 	int cols = minem->cols;
 	char *p_mine = minem->p_mine;
-	int mine = minem->mine;
+	//int mine = minem->mine;
 	for(int loopr = row - 1;loopr <= row + 1;loopr++){
 	
 		if(loopr < 0 ||loopr >= rows)continue;
@@ -110,7 +115,7 @@ int open(int row,int col,const minemap* minem){
 
 				if(!(*pt_mine >> 4)){
 				
-			       		if(open(loopr,loopc,minem)){
+			       		if(openf(loopr,loopc,minem)){
 						return 1;
 					}
 			

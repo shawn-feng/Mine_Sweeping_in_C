@@ -4,7 +4,7 @@ int main(){
 
 	minemap minem = {};
 
-	char agine = '\0';
+	char again = '\0';
 	
 	printf("Welcome to Mine_Sweeping\n");
 
@@ -22,7 +22,8 @@ int main(){
 
 		scanf("%d",&(minem.mine));
 
-		minem.p_mine = (char*)calloc(minem.rows * minem.cols,sizeof(char));
+        minem.p_mine = (char*)calloc(minem.rows * minem.cols,1);
+        printf("p_mine:%p\n",minem.p_mine);
 
 		mine_map(&minem);
 
@@ -39,9 +40,9 @@ int main(){
 		printf("Play agine?(Y/N)");
 
 		setbuf(stdin,NULL);
-		scanf("%c",&agine);
+		scanf("%c",&again);
 
-		}while(agine == 'Y' || agine == 'y');
+		}while(again == 'Y' || again == 'y');
 
 	free(minem.p_mine);
 	minem.p_mine = NULL;

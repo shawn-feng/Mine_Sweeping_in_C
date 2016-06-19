@@ -1,6 +1,6 @@
 #include"mine.h"
 #include"link_ds.h"
-
+#include<time.h>
 typedef struct {
 
 	int row;
@@ -14,25 +14,36 @@ typedef struct {
 	int col;
 }point;
 
-
 static void*group_index[7][7] = {NULL};
-static void *optarr= NULL;
+static link_ds *optarr= NULL;
 static int optn = 0;
-void* analysis(mindmap * minem){
+void scan_mine(minemap *minem);
+int mine_group(minemap *minem,int row,int col,int mine);
+int optadd(int row ,int col,int opt);
+int resolve(unit* newu,int* new_m,int* new_c);
+int onebyone(int mine,int close,int* new_m,int* new_c,unit *newu);
+int compare(void* dat1,void* dat2);
+void fcleararr();
+unit* subset(unit* finded,unit* father);
 
-	int rows = minem->rows;
-	int cols = minem->cols;
-	int mine = minem->mine;
-	char* p_mine = minem->p_mine;
+link_ds* analysis(minemap * minem){
+
 	
-	if(optarr){
+    if(!optarr){
+        
+        optadd(1, 1, 1);
 	
+	}else{
 		clean(optarr);
+        printf("scan_mine begin...\n");
+		scan_mine(minem);
+		printf("scan_mine ending\n");
 	}
+	return optarr;
 
 }
 
-void scan_mine(mindmap *minem){
+void scan_mine(minemap *minem){
 
 	int rows = minem->rows;
 	int cols = minem->cols;
@@ -45,7 +56,7 @@ void scan_mine(mindmap *minem){
 			char *pt_mine = p_mine + loopr*cols + loopc;
 			if(*pt_mine & 2){
 			
-				int minec = pt_mine>>4;	
+				int minec = (*pt_mine)>>4;	
 				switch(minec){
 				
 					case 0:case 8:
@@ -88,7 +99,7 @@ void scan_mine(mindmap *minem){
 
 }//end scan_mine
 
-int mine_group(mindmap *minem,int row,int col,int mine){
+int mine_group(minemap *minem,int row,int col,int mine){
 
 	int rows = minem->rows;
 	int cols = minem->cols;
@@ -96,10 +107,10 @@ int mine_group(mindmap *minem,int row,int col,int mine){
 	int closem = 0;
 	int flagm = 0;	
 	point *p = calloc(8,sizeof(point));
-	for(loopr = row - 1;loopr <= row + 1;loopr++){
+	for(int loopr = row - 1;loopr <= row + 1;loopr++){
 	
 		if(loopr<0 || loopr >=rows)continue;
-		for(loopc = col-1;loopc <=col+1;loopc++){
+		for(int loopc = col-1;loopc <=col+1;loopc++){
 		
 			if(loopc<0 || loopc>=cols)continue;
 			
@@ -123,18 +134,16 @@ int mine_group(mindmap *minem,int row,int col,int mine){
 
 	if(flagm < mine && closem > (mine-flagm)){
 		
-		unit* u_index = NULL;
-		unit* newu = NULL;
 		int new_m = mine - flagm;
 		int new_c = closem;
+        if(!group_index[new_m][new_c])group_index[new_m][new_c] = init_link();
+        unit* newu = insert_back(p, group_index[new_m][new_c]);
+		if(!resolve(newu,&new_m,&new_c)){del(newu);return 0;}
+		if(group_index[new_m][new_c]){
 		
-		resolve(unit* newu,int* new_m,int* new_c){
-		
-		if(u_index = group_index[new_m][new_c]){
-		
-			newu = insert_back(p,u_index);
-		}else{
-			group_index[mine-flagm][closem] = init_link();
+			if(find_data(group_index[new_m][new_c],newu->p_data,compare)){del(newu);return 0;}
+		}else{	
+			group_index[new_m][new_c] = init_link();
 		}
 	}else if(flagm <  mine && closem == (mine-flagm)){
 		
@@ -163,16 +172,10 @@ int optadd(int row ,int col,int opt){
 	u_p->opt = opt;
 	
 	
-	if(optarr == NULL){
-	
-		optarr = init_link();
-	}else{
+	if(optarr == NULL)optarr = init_link();
 	
 		insert_back(u_p,optarr->head);
-	}
-
 	return 0;
-
 }
 
 
@@ -180,33 +183,35 @@ int resolve(unit* newu,int* new_m,int* new_c){
 	
 	unit* start = NULL;
 	unit* find = NULL;
+	int result = 0;
 	switch(*new_c){
 		case 2:
 		return -1;
 		break;
 
 		case 3:
-		return onebyone(1,2,new_m,new_c,newu);
+		result = onebyone(1,2,new_m,new_c,newu);
 		break;
 
 		case 4:
 		case 5:
 		case 6:
 		case 7:
-		if(!onebyone(2,3,new_m,new_c,newu))break;
-		if(!onebyone(1,3,new_m,new_c,newu))break;
-		if(!onebyone(1,2,new_m,new_c,newu))break;
+		if(!(result = onebyone(2,3,new_m,new_c,newu)))break;
+		if(!(result = onebyone(1,3,new_m,new_c,newu)))break;
+		if(!(result = onebyone(1,2,new_m,new_c,newu)))break;
 		default:
 		break;
 	
 	}//end switch
 	
-	return ;
+	return result;
 }
 int onebyone(int mine,int close,int* new_m,int* new_c,unit *newu){
 
-	unit* start = (unit*)group_index[mine][close];
-	unit* find = find_data(start,newu->p_data,compare);
+	if(*new_m < mine || *new_c <= close)return -1;
+
+	unit* find = find_data((link_ds*)group_index[mine][close],newu->p_data,compare);
 	if(!find)return -1;
 	subset(find,newu);
 	if(*new_m -= mine){
@@ -216,30 +221,32 @@ int onebyone(int mine,int close,int* new_m,int* new_c,unit *newu){
 			point (*p)[8] = (point(*)[])(newu->p_data);
 			for(int loop = 0;loop < 8;loop++){
 			
-				if(p[loop].row){
+				if((*p+loop)->row){
 				
-					optadd(p[loop].row,p[loop].col,FLAG);
+					optadd((*p+loop)->row,(*p+loop)->col,FLAG);
 				}
 			
 			}//end for
-			return 1;
+			return 0;
 		
 		}else if(*new_c > *new_m){
 			
-			 resolve(newu,new_m,new_c);
+			return  resolve(newu,new_m,new_c);
 		}
 	}else{
 			point (*p)[8] = (point(*)[])(newu->p_data);
 			for(int loop = 0;loop < 8;loop++){
 			
-				if(p[loop].row){
+				if((*p+loop)->row){
 				
-					optadd(p[loop].row,p[loop].col,OPEN);
+					optadd((*p+loop)->row,(*p+loop)->col,OPEN);
 				}
 			
 			}//end for
-			return 1;
+			return 0;
 	}
+    
+    return -1;
 
 }//end onebyone
 int compare(void* dat1,void* dat2){
@@ -251,7 +258,7 @@ int compare(void* dat1,void* dat2){
 	
 		for(int loop2 = 0;loop2 <8;loop2++){
 		
-			if(p1[loop1].row == p2[loop2].row && p2[loop2].col == p1[loop1].col){
+			if((*p1+loop1)->row == (*p2+loop2)->row && (*p2+loop2)->col == (*p1+loop1)->col){
 				
 				result = 0;
 				break;
@@ -274,16 +281,31 @@ unit* subset(unit* finded,unit* father){
 	
 	for(int loop1 = 0;loop1 < 8;loop1++){
 	
-		if(fed[loop1].row == 0)continue;
+		if((*fed+loop1)->row == 0)continue;
 		for(int loop2 = 0;loop2 <8;loop2++){
-			if(fa[loop2].row == 0)continue;
-			if(fed[loop1].row == fa[loop2].row && fa[loop2].col == fed[loop1].col){
-				fa[loop2].col = 0;
-				fa[loop2].row = 0;
+			if((*fa+loop2)->row == 0)continue;
+			if((*fed+loop1)->row == (*fa+loop2)->row && (*fa+loop2)->col == (*fed+loop1)->col){
+				(*fa+loop2)->col = 0;
+				(*fa+loop2)->row = 0;
 				break;
 			}
 		}
 	
 	}//end for loop1
 	return father;
+}
+
+void fcleararr(){
+	printf("cleararr begin..\n");
+	for(int loopr = 0;loopr < 7;loopr++){
+	
+		for(int loopc = 0;loopc < 7;loopc++){
+		
+			if(group_index[loopr][loopc]){
+			
+				clean((link_ds*)group_index[loopr][loopc]);
+			}
+		}
+	}
+	return;
 }

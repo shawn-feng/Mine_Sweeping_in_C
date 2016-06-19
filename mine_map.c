@@ -7,7 +7,7 @@ void mine_map(const minemap * minem){
 	int mine = minem->mine;
 	char *p_mine = minem->p_mine;
 	printf("mine_map beginning\n");
-	srand(time(0));
+	srand((unsigned int)time(0));
 	
 	int row = 0, col = 0;
 
@@ -41,6 +41,7 @@ void mine_map(const minemap * minem){
 	}
 
 	printf("mine_map ending\n");
+    print_open(minem);
 
 	return ;
 }

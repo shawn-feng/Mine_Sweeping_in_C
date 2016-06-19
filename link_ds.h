@@ -18,13 +18,15 @@ typedef struct link_ds{
 	unit* tail;
 	struct link_ds* (*init_link)(void);
 	unit* (*insert_back)(void*,unit*);
-	void(*delete)(unit*);
+	void(*del)(unit*);
 	void(*clean)(struct link_ds*);
 
 }link_ds;
+int count(link_ds*);
+void* getdata(link_ds*,int);
 struct link_ds* init_link(void);
 unit* insert_back(void *p_data,unit *p_p);
-void delete(unit *p_d);
+void del(unit *p_d);
 void clean(struct link_ds* p_link);
 unit* find_data(link_ds*,void* dat ,int(*compare)(void*,void*));
 
