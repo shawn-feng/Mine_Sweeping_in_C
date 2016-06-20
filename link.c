@@ -17,19 +17,29 @@ unit* insert_back(void *p_data,unit *p_p){
 	unit *newu = NULL;
 	newu = malloc(sizeof(unit));
 	newu->p_data = p_data;
-	newu->p_next = p_p->p_next;
-	p_p->p_next->p_last = newu;
-	newu->p_last = p_p;
-	p_p->p_next = newu;
-	return newu;
+    insert_unit_back(newu,p_p);
+		return newu;
 }
+
+void insert_unit_back(unit* newu,unit *p_p){
+
+    newu->p_next = p_p->p_next;
+    p_p->p_next->p_last = newu;
+    newu->p_last = p_p;
+    p_p->p_next = newu;
+    
+    return;
+}
+
 
 void del(unit *p_d){
 
 	p_d->p_last->p_next = p_d->p_next;
 	p_d->p_next->p_last = p_d->p_last;
-	if(p_d->p_data)free(p_d->p_data);
-	p_d->p_data = NULL;
+    if(p_d->p_data){
+        free(p_d->p_data);
+        p_d->p_data = NULL;
+    }
 	free(p_d);
 	p_d = NULL;
 }
@@ -49,6 +59,18 @@ void clean(struct link_ds* p_link){
 	p_link->tail = NULL;
 	return ;
 }
+void clean_unit(struct link_ds* p_link){
+    
+    unit* p_d = NULL;
+    for(p_d = p_link->head->p_next;p_d != p_link->tail;){
+        
+        unit* temp = p_d->p_next;
+        del(p_d);
+        p_d = temp;
+    }
+    return ;
+}
+
 
 unit* find_data(link_ds* start,void* dat,int(*compare)(void*,void*)){
 

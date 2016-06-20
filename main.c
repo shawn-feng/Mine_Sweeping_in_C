@@ -36,6 +36,8 @@ int main(){
 		
 			printf("fail\n");
 		}
+        free(minem.p_mine);
+        minem.p_mine = NULL;
 
 		printf("Play agine?(Y/N)");
 
@@ -44,8 +46,7 @@ int main(){
 
 		}while(again == 'Y' || again == 'y');
 
-	free(minem.p_mine);
-	minem.p_mine = NULL;
+	
 
 
 	return 0;

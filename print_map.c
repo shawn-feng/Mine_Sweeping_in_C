@@ -4,7 +4,6 @@ void print_map(const minemap * minem){
 
 	int rows = minem->rows;
 	int cols = minem->cols;
-	int mine = minem->mine;
 	char *p_mine = minem->p_mine;
 	
 	for(int i = 0; i <= cols; i++){

@@ -22,12 +22,14 @@ typedef struct link_ds{
 	void(*clean)(struct link_ds*);
 
 }link_ds;
+void insert_unit_back(unit* newu,unit *p_p);
 int count(link_ds*);
 void* getdata(link_ds*,int);
 struct link_ds* init_link(void);
 unit* insert_back(void *p_data,unit *p_p);
 void del(unit *p_d);
 void clean(struct link_ds* p_link);
+void clean_unit(struct link_ds* p_link);
 unit* find_data(link_ds*,void* dat ,int(*compare)(void*,void*));
 
 #endif

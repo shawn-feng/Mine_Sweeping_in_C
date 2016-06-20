@@ -16,7 +16,6 @@ typedef struct {
 
 static void*group_index[7][7] = {NULL};
 static link_ds *optarr= NULL;
-static int optn = 0;
 void scan_mine(minemap *minem);
 int mine_group(minemap *minem,int row,int col,int mine);
 int optadd(int row ,int col,int opt);
@@ -34,7 +33,7 @@ link_ds* analysis(minemap * minem){
         optadd(1, 1, 1);
 	
 	}else{
-		clean(optarr);
+		clean_unit(optarr);
         printf("scan_mine begin...\n");
 		scan_mine(minem);
 		printf("scan_mine ending\n");
@@ -136,14 +135,19 @@ int mine_group(minemap *minem,int row,int col,int mine){
 		
 		int new_m = mine - flagm;
 		int new_c = closem;
-        if(!group_index[new_m][new_c])group_index[new_m][new_c] = init_link();
-        unit* newu = insert_back(p, group_index[new_m][new_c]);
-		if(!resolve(newu,&new_m,&new_c)){del(newu);return 0;}
+        unit * newu = calloc(1,sizeof(unit));
+        newu->p_data = p;
+        if(!resolve(newu,&new_m,&new_c)){free(newu);newu = NULL;return 0;}
 		if(group_index[new_m][new_c]){
 		
-			if(find_data(group_index[new_m][new_c],newu->p_data,compare)){del(newu);return 0;}
-		}else{	
+            if(find_data(group_index[new_m][new_c],newu->p_data,compare)){
+                free(newu),newu = NULL;return 0;
+            }else{
+                insert_unit_back(newu, ((link_ds*)group_index[new_m][new_c])->head);
+            }
+		}else{
 			group_index[new_m][new_c] = init_link();
+            insert_unit_back(newu, ((link_ds*)group_index[new_m][new_c])->head);
 		}
 	}else if(flagm <  mine && closem == (mine-flagm)){
 		
@@ -181,8 +185,7 @@ int optadd(int row ,int col,int opt){
 
 int resolve(unit* newu,int* new_m,int* new_c){
 	
-	unit* start = NULL;
-	unit* find = NULL;
+	
 	int result = 0;
 	switch(*new_c){
 		case 2:
@@ -210,6 +213,7 @@ int resolve(unit* newu,int* new_m,int* new_c){
 int onebyone(int mine,int close,int* new_m,int* new_c,unit *newu){
 
 	if(*new_m < mine || *new_c <= close)return -1;
+    if(!group_index[mine][close])return -1;
 
 	unit* find = find_data((link_ds*)group_index[mine][close],newu->p_data,compare);
 	if(!find)return -1;
