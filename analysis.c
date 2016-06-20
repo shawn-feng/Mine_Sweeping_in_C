@@ -14,8 +14,9 @@ typedef struct {
 	int col;
 }point;
 
-static void*group_index[7][7] = {NULL};
+void*group_index[9][9] = {NULL};
 static link_ds *optarr= NULL;
+static int scant = 0;
 void scan_mine(minemap *minem);
 int mine_group(minemap *minem,int row,int col,int mine);
 int optadd(int row ,int col,int opt);
@@ -26,17 +27,30 @@ void fcleararr();
 unit* subset(unit* finded,unit* father);
 
 link_ds* analysis(minemap * minem){
-
+    
+    if(scant > 6){
+        
+        printf("Have scan 5 times without opt,Now ramdon a point\n");
+        int row = 0;
+        int col = 0;
+        
+        do {
+            row = rand()%(minem->rows);
+            col = rand()%(minem->cols);
+        }while(*(minem->p_mine + minem->cols * row + col) & 6);
+        optadd(row+1, col+1, OPEN);
+        scant = 0;
+        return optarr;
+    }
 	
     if(!optarr){
         
-        optadd(1, 1, 1);
+        optadd(1, 1, OPEN);
 	
 	}else{
+        
 		clean_unit(optarr);
-        printf("scan_mine begin...\n");
 		scan_mine(minem);
-		printf("scan_mine ending\n");
 	}
 	return optarr;
 
@@ -44,6 +58,7 @@ link_ds* analysis(minemap * minem){
 
 void scan_mine(minemap *minem){
 
+    printf("scan_mine begin...\n");
 	int rows = minem->rows;
 	int cols = minem->cols;
 	char* p_mine = minem->p_mine;
@@ -61,25 +76,25 @@ void scan_mine(minemap *minem){
 					case 0:case 8:
 					break;
 					case 1:
-					mine_group(minem,loopr,loopc,1);
+                        if(mine_group(minem,loopr,loopc,1))return;
 					break;
 					case 2:
-					mine_group(minem,loopr,loopc,2);
+                        if(mine_group(minem,loopr,loopc,2))return;
 					break;
 					case 3:
-					mine_group(minem,loopr,loopc,3);
+                        if(mine_group(minem,loopr,loopc,3))return;
 					break;
 					case 4:
-					mine_group(minem,loopr,loopc,4);
+                        if(mine_group(minem,loopr,loopc,4))return;
 					break;
 					case 5:
-					mine_group(minem,loopr,loopc,5);
+                        if(mine_group(minem,loopr,loopc,5))return;
 					break;
 					case 6:
-					mine_group(minem,loopr,loopc,6);
+                        if(mine_group(minem,loopr,loopc,6))return;
 					break;
 					case 7:
-					mine_group(minem,loopr,loopc,7);
+                        if(mine_group(minem,loopr,loopc,7))return;
 					break;
 					default:
 					break;
@@ -93,8 +108,8 @@ void scan_mine(minemap *minem){
 	
 	}//end for loopr
 
-
-
+    scant++;
+    printf("scan_mine ending no opt,scant :%d\n",scant);
 
 }//end scan_mine
 
@@ -137,11 +152,11 @@ int mine_group(minemap *minem,int row,int col,int mine){
 		int new_c = closem;
         unit * newu = calloc(1,sizeof(unit));
         newu->p_data = p;
-        if(!resolve(newu,&new_m,&new_c)){free(newu);newu = NULL;return 0;}
+        if(!resolve(newu,&new_m,&new_c)){free(newu);newu = NULL;return 1;}
 		if(group_index[new_m][new_c]){
 		
             if(find_data(group_index[new_m][new_c],newu->p_data,compare)){
-                free(newu),newu = NULL;return 0;
+                free(newu);newu = NULL;
             }else{
                 insert_unit_back(newu, ((link_ds*)group_index[new_m][new_c])->head);
             }
@@ -155,6 +170,7 @@ int mine_group(minemap *minem,int row,int col,int mine){
 		
 			optadd(p[loop].row,p[loop].col,FLAG);
 		}
+        return 1;
 		
 	}else if(flagm == mine && closem){
 		
@@ -162,10 +178,11 @@ int mine_group(minemap *minem,int row,int col,int mine){
 		
 			optadd(p[loop].row,p[loop].col,OPEN);
 		}
-		
+        
+        return 1;
 	}
-	return 0;
-
+    
+    return 0;
 }
 
 int optadd(int row ,int col,int opt){
@@ -200,6 +217,7 @@ int resolve(unit* newu,int* new_m,int* new_c){
 		case 5:
 		case 6:
 		case 7:
+        case 8:
 		if(!(result = onebyone(2,3,new_m,new_c,newu)))break;
 		if(!(result = onebyone(1,3,new_m,new_c,newu)))break;
 		if(!(result = onebyone(1,2,new_m,new_c,newu)))break;
@@ -308,6 +326,8 @@ void fcleararr(){
 			if(group_index[loopr][loopc]){
 			
 				clean((link_ds*)group_index[loopr][loopc]);
+                free(group_index[loopr][loopc]);
+                group_index[loopr][loopc] = NULL;
 			}
 		}
 	}

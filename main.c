@@ -1,6 +1,8 @@
 #include"mine.h"
 
 int main(){
+    
+    srand((unsigned int)time(0));
 
 	minemap minem = {};
 

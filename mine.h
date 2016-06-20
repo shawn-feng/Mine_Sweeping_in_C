@@ -3,6 +3,7 @@
 
 #include<stdio.h>
 #include<stdlib.h>
+#include<time.h>
 #define OPEN 1
 #define FLAG 2
 #define CANL 3

@@ -6,9 +6,7 @@ void mine_map(const minemap * minem){
 	int cols = minem->cols;
 	int mine = minem->mine;
 	char *p_mine = minem->p_mine;
-	printf("mine_map beginning\n");
-	srand((unsigned int)time(0));
-	
+	printf("mine_map beginning\n");	
 	int row = 0, col = 0;
 
 	for(int loop = 0;loop < mine; loop++){
